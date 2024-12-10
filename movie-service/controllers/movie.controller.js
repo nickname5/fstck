@@ -7,6 +7,7 @@ const getMovies = async (req, res) => {
     const limit = parseInt(req.query.limit, 10) || 10; // Default to 10 items per page
 
     const result = await MovieService.getMovies(filters, page, limit);
+
     res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });

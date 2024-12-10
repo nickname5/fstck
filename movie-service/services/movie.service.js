@@ -11,8 +11,11 @@ const getMovies = async (filters = {}, page = 1, limit = 10) => {
   try {
     const skip = (page - 1) * limit; // Calculate the number of documents to skip
     const movies = await Movie
-      .find({ 'imdb.rating': { $type: 'number' } })
-      .sort({ 'imdb.rating': -1 }).skip(skip).limit(limit);
+      .find({ 'imdb.rating': { $type: 'number' }, 'imdb.votes': { $gt: 10000 } })
+      // .distinct('title')
+      .sort({ 'imdb.rating': -1 }).skip(skip)
+      .limit(limit);
+    // todo: total
     const total = await Movie.countDocuments(filters); // Total number of matching documents
     return {
       movies,

@@ -28,6 +28,7 @@ const movieSchema = new Schema({
     id: { type: Number },
   },
   type: { type: String },
+  poster: { type: String },
   tomatoes: {
     viewer: {
       rating: { type: Number },
