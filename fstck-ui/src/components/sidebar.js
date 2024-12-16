@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import {useState} from "react";
 
 export default function Sidebar() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
   return (
@@ -18,12 +18,14 @@ export default function Sidebar() {
           <line x1="4" y1="18" x2="20" y2="18"/>
         </svg>
       </button>
-      <aside className={clsx("absolute z-10 h-screen w-96 bg-black top-0 left-0", {"hidden": !isSidebarOpen})}>
-        <div className="w-full flex items-center p-6">
-          <button className="text-white cursor-pointer text-4xl mr-6" onClick={toggleSidebar}>⨯</button>
+      <aside className={clsx("absolute z-10 h-screen w-1/3 min-w-96 bg-black top-0 left-0", {"hidden": !isSidebarOpen})}>
+        <header className="w-full flex items-center p-6 h-20">
+          <button className="text-white cursor-pointer text-4xl mr-4 self-end px-2" onClick={toggleSidebar}>⨯</button>
           <h3 className="text-2xl">Filters</h3>
-        </div>
-        Filters here!
+        </header>
+        <section className="p-4">
+          Filters here!
+        </section>
       </aside>
     </>
   )

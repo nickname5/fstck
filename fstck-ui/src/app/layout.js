@@ -24,7 +24,14 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+      <div className="relative">
+        <header className="w-full">
+          <Navigation/>
+        </header>
+        <main className="max-w-screen-xl m-auto mt-6 p-4">
+          {children}
+        </main>
+      </div>
       </body>
     </html>
   );
