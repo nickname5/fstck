@@ -2,8 +2,9 @@
 import clsx from 'clsx';
 
 import {useState} from "react";
+import MovieFilters from "@/components/movieFilters";
 
-export default function Sidebar() {
+export default function Sidebar({filters, onSubmit}) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
@@ -24,7 +25,7 @@ export default function Sidebar() {
           <h3 className="text-2xl">Filters</h3>
         </header>
         <section className="p-4">
-          Filters here!
+          <MovieFilters filters={{}} onSubmit={() => null} />
         </section>
       </aside>
     </>

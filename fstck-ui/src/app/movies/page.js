@@ -7,7 +7,13 @@ import {useCallback, useEffect, useState} from "react";
 
 async function getMovies(page = 1, limit = 20) {
   try {
-    const response = await fetch(`http://localhost:3001/movie?page=${page}&limit=${limit}`);
+    const response = await fetch(`http://localhost:3001/movie?page=${page}&limit=${limit}`, {
+      method: "POST",
+      body: JSON.stringify({ filters: { minVotes: 20000 } }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     return await response.json();
   } catch (e) {
     console.log("Error fetching movies", e);
@@ -16,8 +22,8 @@ async function getMovies(page = 1, limit = 20) {
 }
 
 export default function MovieListPage() {
-  const [data, setData] = useState({ movies: [], metadata: {page: 1, limit: 20, totalPages:0}});
-  const { page, limit, totalPages } = data.metadata;
+  const [data, setData] = useState({ movies: [], metadata: {page: 1, limit: 20, totalPages:0, filters: {imdb: 7}}});
+  const { page, limit, totalPages, filters } = data.metadata;
 
   const fetchMovies = useCallback((page = 1, limit = 20) => {
     getMovies(page, limit).then((resp) => {
@@ -39,8 +45,7 @@ export default function MovieListPage() {
       </div>
       <Pagination page={page} totalPages={totalPages} limit={limit} onPageChange={fetchMovies}/>
       {data.movies.map((movie) => <MovieCard className="mb-4" key={movie._id} movie={movie} />)}
-      <Pagination page={page} totalPages={totalPages} limit={limit}/>
-
+      <Pagination page={page} totalPages={totalPages} limit={limit} onPageChange={fetchMovies}/>
     </div>
   );
 }
