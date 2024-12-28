@@ -38,7 +38,7 @@ const mapFilters = (filters) => {
   }
 
   if (validatedFilters.genres) {
-    query.genres = { $in: validatedFilters.genres }; // todo: fix, at the moment it's an OR
+    query.genres = { $all: validatedFilters.genres };
   }
 
   if (validatedFilters.minYear || validatedFilters.maxYear) {
@@ -69,7 +69,6 @@ const mapFilters = (filters) => {
     ];
   }
 
-  // Map runtime
   if (validatedFilters.runtime) {
     query.runtime = {};
     if (validatedFilters.runtime.min) {

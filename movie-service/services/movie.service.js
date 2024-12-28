@@ -1,6 +1,19 @@
 const Movie = require('../models/movie');
 const { mapFilters } = require('../utils/mappers');
-const logger = require("../config/logger");
+const logger = require('../config/logger');
+
+const movieProjection = {
+  title: 1,
+  imdb: 1,
+  genres: 1,
+  year: 1,
+  _id: 1,
+  cast: 1,
+  directors: 1,
+  plot: 1,
+  fullplot: 1,
+  runtime: 1,
+};
 
 const getMovies = async (filters = {}, page = 1, limit = 10) => {
   try {
@@ -15,6 +28,7 @@ const getMovies = async (filters = {}, page = 1, limit = 10) => {
         'imdb.rating': { $type: 'number' }, // not null rating
         ...resultFilters,
       })
+      .select(movieProjection)
       .sort({ 'imdb.rating': -1 }).skip(skip)
       .limit(resultLimit);
 
