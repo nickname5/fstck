@@ -1,17 +1,18 @@
+const UserService = require('../services/user.service');
+
 const getUsers = async (req, res) => {
   try {
-    res.status(200).json([
-      {
-        id: 1,
-        name: 'John Doe',
-        email: 'johndoe@gmail.com',
-      },
-      {
-        id: 2,
-        name: 'Jane Doe',
-        email: 'jane@gmail.com',
-      },
-    ]);
+    const users = await UserService.getUsers();
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const createUser = async (req, res) => {
+  try {
+    const user = await UserService.createUser(req.body);
+    res.status(201).json(user);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -19,4 +20,5 @@ const getUsers = async (req, res) => {
 
 module.exports = {
   getUsers,
+  createUser,
 };

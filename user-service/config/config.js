@@ -6,8 +6,8 @@ dotenv.config({ path: path.join(__dirname, '../.env') });
 module.exports = {
   env: process.env.NODE_ENV,
   port: process.env.PORT,
-  sql: {
-    url: process.env.MONGODB_URL + (process.env.NODE_ENV === 'test' ? '-test' : ''),
+  postgres: {
+    url: process.env.POSTGRES + (process.env.NODE_ENV === 'test' ? '-test' : ''),
     options: {},
   },
   jwt: {

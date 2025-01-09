@@ -8,6 +8,7 @@ const router = express.Router();
 
 router
   .route('/')
-  .get(userController.getUsers);
+  .get(userController.getUsers)
+  .put(userController.createUser);
 
 module.exports = router;
