@@ -1,4 +1,4 @@
-const { user } = require('../prisma');
+const { user } = require('../../prisma');
 
 const getUsers = async () => {
   try {

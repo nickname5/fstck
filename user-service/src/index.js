@@ -1,10 +1,10 @@
 const { PrismaClient } = require('@prisma/client');
-const app = require('./app');
 const config = require('./config/config');
 const logger = require('./config/logger');
 
 const prisma = new PrismaClient();
 let server;
+const app = require('./app');
 
 prisma.$connect().then(() => {
   logger.info('Connected to PostgreSQL');

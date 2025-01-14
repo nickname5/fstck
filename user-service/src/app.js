@@ -4,7 +4,9 @@ const xss = require('xss-clean');
 const compression = require('compression');
 const cors = require('cors');
 // const passport = require('passport');
+// eslint-disable-next-line import/no-unresolved
 const httpStatus = require('http-status');
+const passport = require('passport');
 const config = require('./config/config');
 const morgan = require('./config/morgan');
 // const { jwtStrategy } = require('./config/passport');
@@ -14,6 +16,8 @@ const { errorConverter, errorHandler } = require('./middleware/error');
 const ApiError = require('./utils/ApiError');
 
 const app = express();
+
+require('./auth/passport');
 
 if (config.env !== 'test') {
   app.use(morgan.successHandler);
@@ -38,6 +42,8 @@ app.use(compression());
 // enable cors
 app.use(cors());
 app.options('*', cors());
+
+app.use(passport.initialize());
 
 // jwt authentication
 // app.use(passport.initialize());
