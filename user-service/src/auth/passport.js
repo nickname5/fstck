@@ -30,6 +30,8 @@ passport.use(
           user = await prisma.user.findUnique({ where: { email } });
         }
 
+        // todo: separate login and sign up
+        // potentially add here email verification
         // Create user if not found
         if (!user) {
           user = await prisma.user.create({

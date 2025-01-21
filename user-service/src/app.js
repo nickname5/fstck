@@ -5,7 +5,6 @@ const compression = require('compression');
 const cors = require('cors');
 // const passport = require('passport');
 // eslint-disable-next-line import/no-unresolved
-const httpStatus = require('http-status');
 const passport = require('passport');
 const config = require('./config/config');
 const morgan = require('./config/morgan');
@@ -59,7 +58,7 @@ app.use('/', routes);
 
 // send back a 404 error for any unknown api request
 app.use((req, res, next) => {
-  next(new ApiError(httpStatus.NOT_FOUND, 'Not found'));
+  next(new ApiError(404, 'Not found'));
 });
 
 // convert error to ApiError, if needed

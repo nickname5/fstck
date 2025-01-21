@@ -8,6 +8,7 @@ const JWT_SECRET = config.jwt.secret;
 // 1) Initiate Google OAuth
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
+// todo: move to auth controller
 // 2) Google Callback
 //    - If authentication succeeds, we have a `user` from the GoogleStrategy
 //    - We'll sign a JWT and return it to the client

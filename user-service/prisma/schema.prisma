@@ -20,4 +20,16 @@ model User {
   googleId  String?  @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt @default(now())
+  posts Rating[]
+}
+
+model Rating {
+  id        String   @id @default(uuid())
+  user      User   @relation(fields: [userId], references: [id])
+  userId    String
+  movieId   String
+  rating    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt @default(now())
+  @@unique([userId, movieId], name: "rating_unique")
 }
