@@ -12,6 +12,6 @@ require('../auth/jwt.strategy');
 router
   .route('/')
   .get(passport.authenticate('jwt', { session: false }), userController.getUsers)
-  .put(userController.createUser);
+  .post(userController.createUser);
 
 module.exports = router;

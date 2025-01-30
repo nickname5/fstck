@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const config = require('../config/config');
 
 const JWT_SECRET = config.jwt.secret;
+const EXPIRATION_TIME = config.jwt.accessExpirationMinutes;
 
 // 1) Initiate Google OAuth
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
@@ -20,7 +21,7 @@ router.get(
     if (!user) return res.redirect('/auth/login-failed');
 
     // Sign a JWT with user ID
-    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: `${EXPIRATION_TIME}m` });
 
     // You can choose how to send the token back:
     // - redirect to a frontend route with the token in the URL
