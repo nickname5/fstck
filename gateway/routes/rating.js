@@ -1,6 +1,10 @@
 const express = require('express');
 const proxy = require('express-http-proxy');
+const multer = require('multer');
 const config = require('../config/config');
+
+const upload = multer({ storage: multer.memoryStorage() });
+const importController = require('../controllers/import.controller');
 
 const router = express.Router();
 
@@ -14,9 +18,6 @@ router.get('/', (req, res, next) => {
 router.post('/', (req, res, next) => {
   ratingProxy(req, res, next);
 });
-router.get('/import', (req, res, next) => {
-  // eslint-disable-next-line no-console
-  console.log('import', req.body);
-});
+router.post('/import', upload.single('file'), importController.importRatings);
 
 module.exports = router;

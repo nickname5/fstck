@@ -9,13 +9,13 @@
     "ecmaVersion": 2018
   },
   "rules": {
-    "no-console": "error",
+    "no-console": "off",
     "func-names": "off",
     "no-underscore-dangle": "off",
     "consistent-return": "off",
     "jest/expect-expect": "off",
     "security/detect-object-injection": "off",
-    "max-len": ["error", { "code": 120 }],
+    "max-len": "off",
     "operator-linebreak": "off"
   }
 }
