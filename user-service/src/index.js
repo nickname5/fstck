@@ -1,6 +1,8 @@
 const { PrismaClient } = require('@prisma/client');
 const config = require('./config/config');
 const logger = require('./config/logger');
+const { connectRabbit } = require('./config/rabbit');
+const { startConsumer } = require('./consumers/importConsumer');
 
 const prisma = new PrismaClient();
 let server;
@@ -9,8 +11,12 @@ const app = require('./app');
 prisma.$connect().then(() => {
   logger.info('Connected to PostgreSQL');
 
-  server = app.listen(config.port, () => {
-    logger.info(`Listening to port ${config.port}`);
+  connectRabbit().then(() => {
+    logger.info('Connected to RabbitMQ');
+    startConsumer();
+    server = app.listen(config.port, () => {
+      logger.info(`Listening to port ${config.port}`);
+    });
   });
 }).catch((error) => {
   logger.error('Error connecting to PostgreSQL:', error);

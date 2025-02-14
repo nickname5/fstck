@@ -56,7 +56,16 @@ const getMovieById = async (id) => {
   }
 };
 
+const findMoviesByTitles = async (titles) => {
+  try {
+    return await Movie.find({ title: { $in: titles } });
+  } catch (error) {
+    throw new Error(`Error fetching movies by titles: ${error.message}`);
+  }
+};
+
 module.exports = {
   getMovies,
   getMovieById,
+  findMoviesByTitles,
 };

@@ -15,7 +15,8 @@ const errorHandler = require('./middleware/errorHandler');
 const config = require('./config/config');
 
 const app = express();
-require('./libs/passport');
+require('./config/passport');
+const { connectRabbit } = require('./config/rabbit');
 
 // Logging
 app.use(morgan('combined'));
@@ -57,7 +58,15 @@ app.use('/api/rating', ratingRouter);
 // Error handling
 app.use(errorHandler);
 
-app.listen(config.port, () => {
-  // eslint-disable-next-line no-console
-  console.log(`Gateway running on port ${config.port}`);
+async function startServer() {
+  await connectRabbit();
+
+  app.listen(config.port, () => {
+    console.log(`Gateway running on port ${config.port}`);
+  });
+}
+
+startServer().catch((err) => {
+  console.error('Error starting server:', err);
+  process.exit(1);
 });

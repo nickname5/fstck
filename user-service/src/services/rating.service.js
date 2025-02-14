@@ -8,4 +8,17 @@ const createRating = async (data) => {
   }
 };
 
-module.exports = { createRating };
+const createRatings = async (data, userId) => {
+  try {
+    const ratings = data.map((r) => ({
+      userId,
+      movieId: r.movieId,
+      rating: parseInt(r.rating),
+    }));
+    return await rating.createMany({ data: ratings, skipDuplicates: true });
+  } catch (error) {
+    throw new Error(`Error saving ratings: ${error.message}`);
+  }
+};
+
+module.exports = { createRating, createRatings };
