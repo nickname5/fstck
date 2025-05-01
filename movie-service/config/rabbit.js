@@ -39,7 +39,7 @@ async function connectRabbit() {
   return channel;
 }
 
-async function getChannel() {
+function getChannel() {
   if (channel) return channel;
 
   throw Error("RabbitMQ channel not initialized. Call 'connectRabbit' first.");

@@ -12,20 +12,27 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: password
       POSTGRES_DB: testdb
+    networks:
+      - app_network
+
   mongodb:
     image: mongo:latest
     container_name: mongodb
     restart: always
     ports:
-      - "28017:27017"
+      - "28017:27017" #27017:27017
     volumes:
       - mongodb_data:/data/db
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: password
+    networks:
+      - app_network
+
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
+    restart: always
     environment:
       RABBITMQ_DEFAULT_USER: admin
       RABBITMQ_DEFAULT_PASS: admin
@@ -33,14 +40,39 @@ services:
       - "5672:5672"    # AMQP port
       - "15672:15672"  # Management UI port
     networks:
-      - rabbit-network
+      - app_network
+
+  redis:
+    image: redis:latest
+    container_name: redis_cache
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - app_network
+    volumes:
+      - redis_data:/data
+    command: ["redis-server", "--appendonly", "yes"]
+
+  redisinsight:
+    image: redislabs/redisinsight:latest
+    container_name: redis_insight
+    restart: always
+    ports:
+      - "5540:5540"
+    networks:
+      - app_network
+    depends_on:
+      - redis
 
 networks:
-  rabbit-network:
+  app_network:
     driver: bridge
 
 volumes:
   mongodb_data:
     driver: local
   postgres_data:
+    driver: local
+  redis_data:
     driver: local

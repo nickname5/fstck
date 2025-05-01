@@ -1,4 +1,7 @@
 const MovieService = require('../services/movie.service');
+const Cache = require('../utils/cache');
+
+const logger = require('../config/logger');
 
 const getMovies = async (req, res) => {
   try {
@@ -16,7 +19,18 @@ const getMovies = async (req, res) => {
 
 const getMovie = async (req, res) => {
   try {
-    const movie = await MovieService.getMovieById(req.params.movieId);
+    const id = req.params.movieId;
+
+    let movie = await Cache.get(id);
+    if (movie) {
+      logger.debug(`Cache hit: ${id}, ${movie.title}`);
+    } else {
+      logger.debug(`Cache miss: ${id}`);
+      movie = await MovieService.getMovieById(id);
+      if (movie) {
+        await Cache.set(id, movie);
+      }
+    }
     res.status(200).json(movie);
   } catch (error) {
     res.status(500).json({ error: error.message });
