@@ -1,40 +1,22 @@
 const express = require('express');
 // const authRoute = require('./auth.route');
-// const userRoute = require('./user.route');
-const movieRoute = require('./movie.route');
-// const docsRoute = require('./docs.route');
-// const config = require('../../config/config');
+const movieRoute = require('./MovieRoute');
 
 const router = express.Router();
 
-const defaultRoutes = [
+const routes = [
   // {
   //   path: '/auth',
   //   route: authRoute,
-  // },x
+  // },
   {
     path: '/movie',
     route: movieRoute,
   },
 ];
 
-// const devRoutes = [
-//   // routes available only in development mode
-//   {
-//     path: '/docs',
-//     route: docsRoute,
-//   },
-// ];
-
-defaultRoutes.forEach((route) => {
+routes.forEach((route) => {
   router.use(route.path, route.route);
 });
-
-/* istanbul ignore next */
-// if (config.env === 'development') {
-//   devRoutes.forEach((route) => {
-//     router.use(route.path, route.route);
-//   });
-// }
 
 module.exports = router;

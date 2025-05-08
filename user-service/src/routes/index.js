@@ -1,14 +1,11 @@
 const express = require('express');
-const authRoute = require('./auth.route');
-// const userRoute = require('./user.route');
-const userRoute = require('./user.route');
-const ratingRoute = require('./rating.route');
-// const docsRoute = require('./docs.route');
-// const config = require('../../config/config');
+const authRoute = require('./AuthRoute');
+const userRoute = require('./UserRoute');
+const ratingRoute = require('./RatingRoute');
 
 const router = express.Router();
 
-const defaultRoutes = [
+const routes = [
   {
     path: '/auth',
     route: authRoute,
@@ -23,23 +20,8 @@ const defaultRoutes = [
   },
 ];
 
-// const devRoutes = [
-//   // routes available only in development mode
-//   {
-//     path: '/docs',
-//     route: docsRoute,
-//   },
-// ];
-
-defaultRoutes.forEach((route) => {
+routes.forEach((route) => {
   router.use(route.path, route.route);
 });
-
-/* istanbul ignore next */
-// if (config.env === 'development') {
-//   devRoutes.forEach((route) => {
-//     router.use(route.path, route.route);
-//   });
-// }
 
 module.exports = router;

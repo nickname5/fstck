@@ -1,5 +1,5 @@
 const { getChannel } = require('../config/rabbit');
-const RatingService = require('../services/rating.service');
+const RatingService = require('../services/RatingService');
 const logger = require('../config/logger');
 const config = require('../config/config');
 

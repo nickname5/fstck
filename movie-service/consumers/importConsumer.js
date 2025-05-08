@@ -1,6 +1,6 @@
 // movieConsumer.js
 const { getChannel } = require('../config/rabbit');
-const MovieService = require('../services/movie.service');
+const MovieService = require('../services/MovieService');
 
 const logger = require('../config/logger');
 const config = require('../config/config');

@@ -1,4 +1,4 @@
-const importService = require('../services/import.service');
+const importService = require('../services/ImportService');
 
 /**
  * Controller method for importing ratings from a CSV file.

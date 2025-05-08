@@ -36,7 +36,7 @@ async function connectRabbit() {
     config.ratingsEnrichedKey,
   );
   logger.info('[Rabbit] Queue created');
-  return channel;
+  return { channel, connection };
 }
 
 async function getChannel() {

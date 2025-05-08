@@ -1,4 +1,4 @@
-const MovieService = require('../services/movie.service');
+const MovieService = require('../services/MovieService');
 const Cache = require('../utils/cache');
 
 const logger = require('../config/logger');

@@ -1,72 +1,64 @@
-require('dotenv').config();
-const express = require('express');
-const morgan = require('morgan');
-const rateLimit = require('express-rate-limit');
-const passport = require('passport');
-const cors = require('cors');
-const xss = require('xss-clean');
-const helmet = require('helmet');
-const compression = require('compression');
-const moviesRouter = require('./routes/movies');
-const userRouter = require('./routes/users');
-const ratingRouter = require('./routes/rating');
-const errorHandler = require('./middleware/errorHandler');
+const app = require('./app');
 
 const config = require('./config/config');
+const logger = require('./config/logger');
 
-const app = express();
-require('./config/passport');
 const { connectRabbit } = require('./config/rabbit');
 
-// Logging
-app.use(morgan('combined'));
-// set security HTTP headers
-app.use(helmet());
+const resources = {
+  httpServer: null,
+  rabbitConn: null,
+  rabbitChan: null,
+};
 
-// parse json request body
-app.use(express.json());
-
-// parse urlencoded request body
-app.use(express.urlencoded({ extended: true }));
-// enable cors
-app.use(cors());
-app.options('*', cors());
-// sanitize request data
-app.use(xss());
-
-// gzip compression
-app.use(compression());
-
-// Rate limiting
-app.use(
-  rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100,
-  }),
-);
-
-app.use('/api', passport.authenticate('jwt', { session: false }), (req, res, next) => {
-  // If we get here, token is valid
-  // You could attach req.user = user from the token
-  next();
-});
-
-app.use('/api/movie', moviesRouter);
-app.use('/api/user', userRouter);
-app.use('/api/rating', ratingRouter);
-
-// Error handling
-app.use(errorHandler);
-
-async function startServer() {
-  await connectRabbit();
-
-  app.listen(config.port, () => {
-    console.log(`Gateway running on port ${config.port}`);
-  });
+async function openResources() {
+  const { connection, channel } = await connectRabbit();
+  resources.rabbitConn = connection;
+  resources.rabbitChan = channel;
+  logger.info('Connected to RabbitMQ');
 }
 
-startServer().catch((err) => {
-  console.error('Error starting server:', err);
-  process.exit(1);
+async function closeResources(exitCode = 0) {
+  try {
+    // Stop HTTP first so we don’t accept new work
+    if (resources.httpServer) {
+      await new Promise((res) => resources.httpServer.close(res));
+      logger.info('HTTP server closed');
+    }
+
+    // RabbitMQ
+    if (resources.rabbitChan) await resources.rabbitChan.close();
+    if (resources.rabbitConn) await resources.rabbitConn.close();
+    logger.info('RabbitMQ closed');
+  } catch (err) {
+    logger.error('Error during shutdown: ', err);
+    process.exit(exitCode || 1);
+  } finally {
+    // Ensure we always exit
+    process.exit(exitCode);
+  }
+}
+
+process.on('SIGINT', () => { logger.warn('SIGINT received'); closeResources(0); });
+process.on('SIGTERM', () => { logger.warn('SIGTERM received'); closeResources(0); });
+
+process.on('unhandledRejection', (reason) => {
+  logger.error('Unhandled promise rejection: ', reason);
+  closeResources(1);
 });
+
+process.on('uncaughtException', (err) => {
+  logger.error('Uncaught exception: ', err);
+  closeResources(1);
+});
+
+(async function start() {
+  try {
+    await openResources();
+    resources.httpServer = app.listen(config.port, () => logger.info(`Gateway-service listening on :${config.port}`));
+  } catch (err) {
+    logger.error('Startup failed: ', err);
+    /* if openResources threw, some handles may still be live */
+    await closeResources(1);
+  }
+}());

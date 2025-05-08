@@ -28,8 +28,4 @@ function getClient() {
   throw Error('Redis client is not initialized');
 }
 
-// await client.set('key', 'value');
-// const value = await client.get('key');
-// await client.disconnect();
-
 module.exports = { getClient, connectRedis };

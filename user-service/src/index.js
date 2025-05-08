@@ -4,47 +4,79 @@ const logger = require('./config/logger');
 const { connectRabbit } = require('./config/rabbit');
 const { startConsumer } = require('./consumers/importConsumer');
 
-const prisma = new PrismaClient();
-let server;
 const app = require('./app');
 
-prisma.$connect().then(() => {
-  logger.info('Connected to PostgreSQL');
-
-  connectRabbit().then(() => {
-    logger.info('Connected to RabbitMQ');
-    startConsumer();
-    server = app.listen(config.port, () => {
-      logger.info(`Listening to port ${config.port}`);
-    });
-  });
-}).catch((error) => {
-  logger.error('Error connecting to PostgreSQL:', error);
-  process.exit(1); // Exit the process if the database connection fails
-});
-
-const exitHandler = () => {
-  if (server) {
-    server.close(() => {
-      logger.info('Server closed');
-      process.exit(1);
-    });
-  } else {
-    process.exit(1);
-  }
+const resources = {
+  httpServer: null,
+  prisma: null,
+  rabbitConn: null,
+  rabbitChan: null,
 };
 
-const unexpectedErrorHandler = (error) => {
-  logger.error(error);
-  exitHandler();
-};
+async function openResources() {
+  // MongoDB
+  resources.prisma = new PrismaClient();
+  await resources.prisma.$connect();
+  logger.info('Connected to Prisma');
 
-process.on('uncaughtException', unexpectedErrorHandler);
-process.on('unhandledRejection', unexpectedErrorHandler);
+  // RabbitMQ
+  const { connection, channel } = await connectRabbit();
+  resources.rabbitConn = connection;
+  resources.rabbitChan = channel;
+  logger.info('Connected to RabbitMQ');
 
-process.on('SIGTERM', () => {
-  logger.info('SIGTERM received');
-  if (server) {
-    server.close();
+  // Kick off consumer (returns a promise you can await if you want)
+  await startConsumer();
+  logger.info('Import consumer started');
+}
+
+async function closeResources(exitCode = 0) {
+  try {
+    // Stop HTTP first so we don’t accept new work
+    if (resources.httpServer) {
+      await new Promise((res) => resources.httpServer.close(res));
+      logger.info('HTTP server closed');
+    }
+
+    // Mongo
+    if (resources.prisma) {
+      await resources.prisma.$disconnect();
+      logger.info('Prisma disconnected');
+    }
+
+    // RabbitMQ
+    if (resources.rabbitChan) await resources.rabbitChan.close();
+    if (resources.rabbitConn) await resources.rabbitConn.close();
+    logger.info('RabbitMQ closed');
+  } catch (err) {
+    logger.error('Error during shutdown: ', err);
+    process.exit(exitCode || 1);
+  } finally {
+    // Ensure we always exit
+    process.exit(exitCode);
   }
+}
+
+process.on('SIGINT', () => { logger.warn('SIGINT received'); closeResources(0); });
+process.on('SIGTERM', () => { logger.warn('SIGTERM received'); closeResources(0); });
+
+process.on('unhandledRejection', (reason) => {
+  logger.error('Unhandled promise rejection: ', reason);
+  closeResources(1);
 });
+
+process.on('uncaughtException', (err) => {
+  logger.error('Uncaught exception: ', err);
+  closeResources(1);
+});
+
+(async function start() {
+  try {
+    await openResources();
+    resources.httpServer = app.listen(config.port, () => logger.info(`Movie-service listening on :${config.port}`));
+  } catch (err) {
+    logger.error('Startup failed: ', err);
+    /* if openResources threw, some handles may still be live */
+    await closeResources(1);
+  }
+}());
