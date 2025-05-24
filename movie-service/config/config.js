@@ -19,4 +19,5 @@ module.exports = {
   userRatingsQueue: process.env.USER_RATINGS_QUEUE || 'user_ratings_queue',
   ratingsImportKey: process.env.ROUTING_KEY_RATINGS_IMPORT || 'ratings.import',
   ratingsEnrichedKey: process.env.ROUTING_KEY_RATINGS_ENRICHED || 'ratings.enriched',
+  openAIKey: process.env.OPENAI_API_KEY || '',
 };

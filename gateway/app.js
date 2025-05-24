@@ -9,6 +9,7 @@ const compression = require('compression');
 const moviesRouter = require('./routes/MovieRoute');
 const userRouter = require('./routes/UserRoute');
 const ratingRouter = require('./routes/RatingRoute');
+const aiRouter = require('./routes/AIRoute');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -50,6 +51,7 @@ app.use('/api', passport.authenticate('jwt', { session: false }), (req, res, nex
 app.use('/api/movie', moviesRouter);
 app.use('/api/user', userRouter);
 app.use('/api/rating', ratingRouter);
+app.use('/api/ai', aiRouter);
 
 // Error handling
 app.use(errorHandler);
