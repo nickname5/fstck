@@ -6,6 +6,7 @@ dotenv.config({ path: path.join(__dirname, '../.env') });
 module.exports = {
   env: process.env.NODE_ENV,
   port: process.env.PORT,
+  userServiceURL: process.env.USER_SERVICE_URL,
   mongoose: {
     url: process.env.MONGODB_URL + (process.env.NODE_ENV === 'test' ? '-test' : ''),
     options: {},

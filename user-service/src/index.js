@@ -73,7 +73,7 @@ process.on('uncaughtException', (err) => {
 (async function start() {
   try {
     await openResources();
-    resources.httpServer = app.listen(config.port, () => logger.info(`Movie-service listening on :${config.port}`));
+    resources.httpServer = app.listen(config.port, () => logger.info(`User-service listening on :${config.port}`));
   } catch (err) {
     logger.error('Startup failed: ', err);
     /* if openResources threw, some handles may still be live */

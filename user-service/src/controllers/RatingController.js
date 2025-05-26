@@ -9,6 +9,16 @@ const addRating = async (req, res) => {
   }
 };
 
+const getUserRatings = async (req, res) => {
+  try {
+    const ratings = await RatingService.getUserRatings(req.params.userId);
+    res.status(200).json(ratings);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   addRating,
+  getUserRatings,
 };

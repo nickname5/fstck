@@ -15,6 +15,12 @@ const movieProjection = {
   runtime: 1,
 };
 
+const recommendationProjection = {
+  _id: 1,
+  year: 1,
+  title: 1,
+}
+
 const getMovies = async (filters = {}, page = 1, limit = 10) => {
   try {
     const resultLimit = limit < 100 ? limit : 100; // Limit the number of items per page to 100
@@ -58,7 +64,15 @@ const getMovieById = async (id) => {
 
 const findMoviesByTitles = async (titles) => {
   try {
-    return await Movie.find({ title: { $in: titles } });
+    return await Movie.find({ title: { $in: titles } }).lean();
+  } catch (error) {
+    throw new Error(`Error fetching movies by titles: ${error.message}`);
+  }
+};
+
+const getMoviesByIds = async (ids) => {
+  try {
+    return await Movie.find({ _id: { $in: ids } }).select(recommendationProjection).lean();
   } catch (error) {
     throw new Error(`Error fetching movies by titles: ${error.message}`);
   }
@@ -68,4 +82,5 @@ module.exports = {
   getMovies,
   getMovieById,
   findMoviesByTitles,
+  getMoviesByIds,
 };

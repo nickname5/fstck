@@ -8,4 +8,8 @@ router
   .route('/')
   .post(passport.authenticate('jwt', { session: false }), RatingController.addRating);
 
+router
+  .route('/user-ratings/:userId')
+  .get(passport.authenticate('jwt', { session: false }), RatingController.getUserRatings);
+
 module.exports = router;

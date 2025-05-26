@@ -21,4 +21,18 @@ const createRatings = async (data, userId) => {
   }
 };
 
-module.exports = { createRating, createRatings };
+const getUserRatings = async (userId) => {
+  try {
+    return await rating.findMany({
+      where: { userId },
+      select: {
+        movieId: true,
+        rating: true,
+      },
+    });
+  } catch (error) {
+    throw new Error(`Error getting user ratings: ${error.message}`);
+  }
+}
+
+module.exports = { createRating, createRatings, getUserRatings };

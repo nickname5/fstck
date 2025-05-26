@@ -9,7 +9,7 @@ const compression = require('compression');
 const moviesRouter = require('./routes/MovieRoute');
 const userRouter = require('./routes/UserRoute');
 const ratingRouter = require('./routes/RatingRoute');
-const aiRouter = require('./routes/AIRoute');
+const recommendationRouter = require('./routes/RecommendationRoute');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -44,14 +44,13 @@ app.use(
 
 app.use('/api', passport.authenticate('jwt', { session: false }), (req, res, next) => {
   // If we get here, token is valid
-  // You could attach req.user = user from the token
   next();
 });
 
 app.use('/api/movie', moviesRouter);
 app.use('/api/user', userRouter);
 app.use('/api/rating', ratingRouter);
-app.use('/api/ai', aiRouter);
+app.use('/api/recommendation', recommendationRouter);
 
 // Error handling
 app.use(errorHandler);
