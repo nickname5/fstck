@@ -4,14 +4,19 @@ import MovieCard from "@/components/movieCard/movieCard";
 import Sidebar from "@/components/sidebar";
 import Pagination from "@/components/pagination";
 import {useCallback, useEffect, useState} from "react";
+import {useSession} from "next-auth/react";
 
-async function getMovies(page = 1, limit = 20) {
+async function getMovies(token, page = 1, limit = 20, ) {
+  if (!token) {
+    return null;
+  }
   try {
-    const response = await fetch(`http://localhost:3001/movie?page=${page}&limit=${limit}`, {
+    const response = await fetch(`http://localhost:3003/api/movie?page=${page}&limit=${limit}`, {
       method: "POST",
       body: JSON.stringify({ filters: { minVotes: 20000 } }),
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
     });
     return await response.json();
@@ -24,14 +29,15 @@ async function getMovies(page = 1, limit = 20) {
 export default function MovieListPage() {
   const [data, setData] = useState({ movies: [], metadata: {page: 1, limit: 20, totalPages:0, filters: {imdb: 7}}});
   const { page, limit, totalPages, filters } = data.metadata;
+  const { data: session } = useSession();
 
   const fetchMovies = useCallback((page = 1, limit = 20) => {
-    getMovies(page, limit).then((resp) => {
+    getMovies(session?.gatewayJwt, page, limit).then((resp) => {
       if (resp) {
         setData(resp);
       }
     });
-  }, []);
+  }, [session?.gatewayJwt]);
 
   useEffect(() => {
     fetchMovies();

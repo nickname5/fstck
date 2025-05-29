@@ -9,7 +9,7 @@ const authenticate = (req, res) => {
   if (!user) return res.redirect('/auth/login-failed');
 
   // Sign a JWT with user ID
-  const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: `${EXPIRATION_TIME}m` });
+  const token = jwt.sign({ userId: user.id }, JWT_SECRET, { algorithm: 'HS512', expiresIn: `${EXPIRATION_TIME}m` });
 
   // You can choose how to send the token back:
   // - redirect to a frontend route with the token in the URL

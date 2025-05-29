@@ -9,6 +9,9 @@ npx prisma migrate dev --name "text_here"
 redis insights http://127.0.0.1:5540
 rabbit admin http://localhost:15672/#/
 
+obtain token
+http://localhost:3002/auth/google
+
 todo:
 clean up event bus related code
 logging

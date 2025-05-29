@@ -12,6 +12,10 @@ router.get('/', (req, res, next) => {
   moviesProxy(req, res, next);
 });
 
+router.post('/', (req, res, next) => {
+  moviesProxy(req, res, next);
+});
+
 router.get('/:movieId', (req, res, next) => {
   moviesProxy(req, res, next);
 });

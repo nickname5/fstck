@@ -6,6 +6,7 @@ const config = require('./config');
 const opts = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
   secretOrKey: config.jwtSecret,
+  algorithms: ['HS512'],
 };
 
 passport.use(

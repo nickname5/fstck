@@ -18,7 +18,19 @@ const createUser = async (req, res) => {
   }
 };
 
+const resolveUser = async (req, res) => {
+  try {
+    const googleId = req.params.googleId;
+
+    const user = await UserService.resolveUser(googleId);
+    res.status(201).json({ userId: user.id });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   getUsers,
   createUser,
+  resolveUser,
 };

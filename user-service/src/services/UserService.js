@@ -16,4 +16,8 @@ const createUser = async (data) => {
   }
 };
 
-module.exports = { getUsers, createUser };
+const resolveUser = async (googleId) => user.findUnique({
+  where: { googleId },
+});
+
+module.exports = { getUsers, createUser, resolveUser };

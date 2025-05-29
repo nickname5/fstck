@@ -10,6 +10,7 @@ const opts = {
   // Look for the token in the Authorization header as a Bearer token
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
   secretOrKey: JWT_SECRET,
+  algorithms: ['HS512'],
 };
 
 passport.use(

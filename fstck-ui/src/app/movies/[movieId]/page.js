@@ -1,10 +1,17 @@
 import Image from 'next/image'
 import Chips from "@/components/chips";
 import placeholder from "./../../../../public/file.svg"
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/libs/auth';
 
 async function getMovieById(id) {
   try {
-    const response = await fetch(`http://localhost:3001/movie/${id}`);
+    const session = await getServerSession(authOptions);
+    const token = session?.gatewayJwt;
+    const response = await fetch(
+      `${process.env.GATEWAY_SERVICE_URL}/api/movie/${id}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
     return await response.json();
   } catch (e) {
     console.log("Error fetching movies", e);

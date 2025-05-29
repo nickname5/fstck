@@ -11,4 +11,6 @@ router
   .get(passport.authenticate('jwt', { session: false }), UserController.getUsers)
   .post(UserController.createUser);
 
+router.route('/resolve/:googleId').get(UserController.resolveUser);
+
 module.exports = router;
