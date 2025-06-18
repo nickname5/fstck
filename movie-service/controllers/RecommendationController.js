@@ -5,8 +5,55 @@ const axios = require('axios');
 const MovieService = require('../services/MovieService');
 
 // eslint-disable-next-line max-len
-const GET_RECOMMENDATION_INSTRUCTIONS = `Give me a formatted list of movies that user hasn't seen but high likely would
- like, based on provided user ratings. Limit the list to 50 items`;
+const GET_RECOMMENDATION_INSTRUCTIONS = `
+You are a movie-recommendation engine.
+
+• You will receive ONE JSON array called "ratings".
+  – Each element has "title" and "rating".
+  – Every title in this list has ALREADY been watched by the user.
+
+• Your task: suggest up to 20 OTHER movies the user is likely to enjoy.
+  – ABSOLUTELY do NOT include any title that appears in "ratings".
+  – Do not explain your reasoning.
+
+  Return the result ONLY by calling the function recommend_movies, whose
+schema is provided. Do not output anything else.`
+
+const instr = `
+You are a movie-recommendation engine.
+
+• The array "watched" contains titles the user ALREADY saw.
+• The array "ratings" contains those same movies with scores.
+Return up to 20 NEW movies, not present in "watched".
+Respond ONLY via the function recommend_movies.
+`;
+const fewShotsMessages = [
+  {
+    role: "user",
+    content: '{"watched":["Titanic"],"ratings":[{"title":"Titanic","rating":10}]}'
+  },
+  {
+    role: "assistant",
+    content: 'Titanic, Avatar'
+  },
+  {
+    role: "system",
+    content: "❌ Invalid.  This answer repeats a watched title."
+  },
+  {
+    role: "user",
+    content: '{"watched":["Titanic"],"ratings":[{"title":"Titanic","rating":10}]}'
+  },
+  {
+    role: "assistant",
+    content:
+      'Function call: recommend_movies({"movies":[{"title":"Avatar"},{"title":"The Abyss"}]})'
+  },
+  {
+    role: "system",
+    content: "✅ Correct.  No watched titles are repeated."
+  },
+];
 
 const movieRecommendationSchema = {
   type: "object",
@@ -36,21 +83,24 @@ class RecommendationController {
   }
 
   async getAiRecommendations(ratings) {
+    const watchedTitles = ratings.map(r => r.title);
+
     const response = await this.openai.chat.completions.create({
       model: "gpt-4o-2024-08-06",
       messages: [
-        { role: "system", content: GET_RECOMMENDATION_INSTRUCTIONS },
+        { role: "system", content: instr },
+        ...fewShotsMessages,
         {
           role: "user",
-          content: `Here are the user’s ratings:\n${JSON.stringify(ratings, null, 2)}`,
-        },
+          content: JSON.stringify({ watched: watchedTitles, ratings })
+        }
       ],
       tools: [
         {
           type: "function",
           function: {
             name: "recommend_movies",
-            description: "Return a list of movie recommendations",
+            description: "Return up to 20 new movie recommendations",
             parameters: movieRecommendationSchema,
           },
         },
@@ -100,8 +150,15 @@ class RecommendationController {
         year: movie.year,
         rating: userMoviesIdRatingMap[movie._id],
       }));
+      logger.debug(`getting ai recommendations with ${ratings.length} ratings`);
       const result = await this.getAiRecommendations(ratings);
+      console.log("ai result", result);
       const recommendationMovies = await MovieService.findMoviesByTitles(result);
+      // console.log("recommendationMovies", recommendationMovies.map((m) => m.title));
+      // const duplicates = recommendationMovies
+      //   .filter((movie) => userMoviesIdRatingMap[movie._id])
+      //   .map((movie) => ({ title: movie.title, year: movie.year, id: movie._id}));
+      // console.log("duplicates", duplicates);
       res.status(200).json(recommendationMovies);
     } catch (error) {
       logger.error(error);
